@@ -1,0 +1,4 @@
+*.vim
+vgcore*
+a.out
+test
