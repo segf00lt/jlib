@@ -1,6 +1,7 @@
 #define JLIB_POOL_IMPL
 #define JLIB_BASIC_IMPL
 #define JLIB_ARENA_IMPL
+#define JLIB_POOL_UNSAFE
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,7 +28,7 @@ struct List {
 };
 
 void list_init(List *l) {
-	pool_init(&l->nodepool, sizeof(Node), 5, 1);
+	pool_init(&l->nodepool, sizeof(Node), 5, 8);
 	l->head = l->tail = NULL;
 }
 
@@ -61,6 +62,15 @@ void list_destroy(List *l) {
 	pool_destroy(&l->nodepool);
 	l->head = l->tail = NULL;
 }
+
+/*
+ * IDEAS FOR LIBRARIES
+ * io.h printf, files and streams
+ * re.h regex
+ * arr.h stb style dynamic array
+ * map.h stb style hash map
+ * str.h strings (fork someone's library maybe)
+ */
 
 // TODO make unit tests for libs
 int main() {
@@ -103,5 +113,13 @@ int main() {
 	assert(x == ni>>1);
 	printf("ni = %zu\n",ni);
 	printf("UNTOUCHED ITEM %p\n", list.nodepool.untouched_item);
+	Pool testpool;
+	pool_init(&testpool, sizeof(Node), 5, 15);
+	pool_cannibalize(&list.nodepool, &testpool);
+	printf("chunks_available = %zu\n",list.nodepool.chunks_available);
+	pool_slim(&list.nodepool);
+	printf("chunks_available = %zu\n",list.nodepool.chunks_available);
+	for(int i = 0; i < ni; ++i) list_append(&list, ibuf[i]);
+	printf("chunks_available = %zu\n",list.nodepool.chunks_available);
 	list_destroy(&list);
 }
