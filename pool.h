@@ -16,7 +16,7 @@ typedef struct Pool Pool;
 typedef struct Pool_free_node Pool_free_node;
 typedef struct Pool_locator Pool_locator;
 
-void pool_init(Pool *p, size_t item_size, size_t chunk_size, size_t initial_chunk_count);
+void pool_init(Pool *p, size_t item_size, size_t max_items, size_t initial_chunk_count);
 void* pool_alloc(Pool *p);
 void pool_cannibalize(Pool *p, Pool *food);
 void pool_slim(Pool *p);
@@ -95,7 +95,7 @@ void pool_free(Pool *p, void *ptr) {
 	for(i = 0; i < p->chunks_in_use; ++i)
 		if(free >= p->chunks[i] && free <= p->chunks[i] + p->chunk_bytes)
 			break;
-	assert("pointer is not in pool bounds" && i >= p->chunks_in_use);
+	assert("pointer is not in pool bounds" && i < p->chunks_in_use);
 #endif
 	Pool_free_node *free_node = ptr;
 	free_node->next = p->free;
