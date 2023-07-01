@@ -57,7 +57,7 @@ void pool_init(Pool *p, size_t item_size, size_t max_items, size_t initial_chunk
 	p->chunks_available = initial_chunk_count;
 	p->chunks = malloc(sizeof(unsigned char*) * initial_chunk_count);
 	for(size_t i = 0; i < initial_chunk_count; ++i)
-		p->chunks[i] = malloc(initial_chunk_count * p->chunk_bytes);
+		p->chunks[i] = malloc(p->chunk_bytes);
 	p->untouched_item = p->chunks[0];
 	p->free = NULL;
 }
